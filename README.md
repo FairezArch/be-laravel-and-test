@@ -1,5 +1,7 @@
 # be-laravel-and-test
 
+Enter into the backend folder for laravel setup.
+
 Run composer install.
 
 Run php artisan jwt:secret, for add secret key on .env.
