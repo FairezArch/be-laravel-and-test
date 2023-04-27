@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use App\Models\Product;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ProductTest extends TestCase
 {
+    use WithFaker;
      /**
      * A feature test_the_product.
      *
@@ -15,6 +17,10 @@ class ProductTest extends TestCase
      */
     public function test_the_product()
     {
+        Product::create([
+            'name' => $this->faker->word(),
+            'price' => $this->faker->numberBetween(5000, 200000),
+        ]);
         $this->json('GET', 'api/product', [], [
             'Accept' => 'application/json',
         ])->assertStatus(200)->assertJsonStructure([

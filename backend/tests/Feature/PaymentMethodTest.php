@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use App\Models\PaymentMethod;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class PaymentMethodTest extends TestCase
 {
+    use WithFaker;
     /**
      * A feature test_the_payment_method.
      *
@@ -15,6 +17,11 @@ class PaymentMethodTest extends TestCase
      */
     public function test_the_payment_method()
     {
+        PaymentMethod::create([
+            'name' => $this->faker->word(),
+            'is_active' => 1,
+        ]);
+
         $this->json('GET', 'api/payment-method', [], [
             'Accept' => 'application/json',
         ])->assertStatus(200)->assertJsonStructure([

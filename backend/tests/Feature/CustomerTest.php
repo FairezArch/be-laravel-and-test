@@ -2,12 +2,15 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use App\Models\Customer;
+use App\Models\CustomerAddress;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class CustomerTest extends TestCase
 {
+    use WithFaker;
     /**
      * A feature test_the_customer.
      *
@@ -15,9 +18,20 @@ class CustomerTest extends TestCase
      */
     public function test_the_customer()
     {
+        $cust = Customer::create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+
+        ]);
+        CustomerAddress::create([
+            'customer_id' => $cust->id,
+            "address" => $this->faker->word(6),
+        ]);
+        $data = Customer::find($cust->id);
         $login = $this->post('api/auth/login', [
-            "email" => "johndoe@example.net",
-            "password" => "123123"
+            "email" =>  $data->email,
+            "password" => 'password', // password
         ],['Accept' => 'application/json'])->assertStatus(200)->decodeResponseJson();
 
         $data = $login['data']['id'];
@@ -38,11 +52,22 @@ class CustomerTest extends TestCase
      */
     public function test_create_customer_if_email_exits()
     {
+        $cust = Customer::create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+
+        ]);
+        CustomerAddress::create([
+            'customer_id' => $cust->id,
+            "address" => $this->faker->word(6),
+        ]);
+        $data = Customer::find($cust->id);
         $this->json('POST', 'api/customer', [
-            "name" => "johndoes",
-            "email" => "johndoe@example.net",
-            "password" => "abcerty",
-            "address" => "Jl. Nagrek",
+            "name" => $this->faker->name(),
+            "email" => $data->email,
+            "password" => "password",
+            "address" => $this->faker->word(6),
         ], ['Accept' => 'application/json'])
         ->assertStatus(422)
         ->assertJsonStructure([
@@ -61,10 +86,10 @@ class CustomerTest extends TestCase
     public function test_create_customer_success()
     {
         $this->json('POST', 'api/customer', [
-            "name" => "afrianda",
-            "email" => "alfabet@example.net",
-            "password" => "aflabet123",
-            "address" => "Jl. Nagrek",
+            "name" => $this->faker->name(),
+            "email" => $this->faker->unique()->safeEmail(),
+            "password" => "password",
+            "address" => $this->faker->word(6),
         ], ['Accept' => 'application/json'])
         ->assertStatus(200)
         ->assertJsonStructure([
@@ -80,18 +105,29 @@ class CustomerTest extends TestCase
      */
     public function test_update_customer_success()
     {
+        $cust = Customer::create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+
+        ]);
+        CustomerAddress::create([
+            'customer_id' => $cust->id,
+            "address" => $this->faker->word(6),
+        ]);
+        $data = Customer::find($cust->id);
         $login = $this->post('api/auth/login', [
-            "email" => "johndoe@example.net",
-            "password" => "123123",
+            "email" => $data->email,
+            "password" => "password",
         ],['Accept' => 'application/json'])->assertStatus(200)->decodeResponseJson();
 
         $id = $login['data']['id'];
         $token = $login['token'];
 
         $this->json('PUT', 'api/customer/'.$id, [
-            "name" => "jon adreson",
-            "email" => "johndoe@example.net",
-            "address" => "Jl. Nagrek",
+            "name" => $this->faker->name(),
+            "email" => $this->faker->unique()->safeEmail(),
+            "address" => $this->faker->word(6),
         ], ['Authorization' => 'Bearer ' . $token, 'Accept' => 'application/json'])
         ->assertStatus(200)
         ->assertJsonStructure([
@@ -107,18 +143,42 @@ class CustomerTest extends TestCase
      */
     public function test_update_customer_if_email_exits()
     {
+        $cust = Customer::create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+
+        ]);
+        CustomerAddress::create([
+            'customer_id' => $cust->id,
+            "address" => $this->faker->word(6),
+        ]);
+        $data = Customer::find($cust->id);
+
         $login = $this->post('api/auth/login', [
-            "email" => "johndoe@example.net",
-            "password" => "123123"
+            "email" => $data->email,
+            "password" => "password"
         ],['Accept' => 'application/json'])->assertStatus(200)->decodeResponseJson();
 
         $id = $login['data']['id'];
         $token = $login['token'];
 
+        $cust2 = Customer::create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+
+        ]);
+        CustomerAddress::create([
+            'customer_id' => $cust2->id,
+            "address" => $this->faker->word(6),
+        ]);
+        $data2 = Customer::find($cust2->id);
+
         $this->json('PUT', 'api/customer/'.$id, [
-            "name" => "jon adreson",
-            "email" => "doejohn@example.net",
-            "address" => "Jl. Nagrek",
+            "name" => $this->faker->name(),
+            "email" => $data2->email,
+            "address" => $this->faker->word(6),
         ], ['Authorization' => 'Bearer ' . $token, 'Accept' => 'application/json'])
         ->assertStatus(422)
         ->assertJsonStructure([
@@ -136,9 +196,21 @@ class CustomerTest extends TestCase
      */
     public function test_delete_customer_then_logout()
     {
+        $cust = Customer::create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+
+        ]);
+        CustomerAddress::create([
+            'customer_id' => $cust->id,
+            "address" => $this->faker->word(6),
+        ]);
+        $data = Customer::find($cust->id);
+
         $login = $this->post('api/auth/login', [
-            "email" => "johndoe@example.net",
-            "password" => "123123"
+            "email" => $data->email,
+            "password" => "password"
         ],['Accept' => 'application/json'])->assertStatus(200)->decodeResponseJson();
 
         $id = $login['data']['id'];

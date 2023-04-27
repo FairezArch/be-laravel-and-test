@@ -18,8 +18,8 @@ class CustomerSeeder extends Seeder
         //
         $now = Carbon::now()->toDateTimeString();
         $data = [
-            ['name' => 'John Doe', 'email' => 'johndoe@example.net', 'password' => bcrypt('123123'), 'created_at' => $now, 'updated_at' => $now],
-            ['name' => 'Doe John', 'email' => 'doejohn@example.net', 'password' => bcrypt('123123'), 'created_at' => $now, 'updated_at' => $now]
+            ['name' => 'John Doe', 'email' => 'johndoe@example.net', 'password' => bcrypt('password'), 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Doe John', 'email' => 'doejohn@example.net', 'password' => bcrypt('password'), 'created_at' => $now, 'updated_at' => $now]
         ];
 
         Customer::insert($data);

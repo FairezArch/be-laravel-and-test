@@ -2,12 +2,17 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use App\Models\Product;
+use App\Models\Customer;
+use App\Models\PaymentMethod;
+use App\Models\CustomerAddress;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class TransactionTest extends TestCase
 {
+    use WithFaker;
      /**
      * A feature test_the_transaction_by_customer.
      *
@@ -15,9 +20,21 @@ class TransactionTest extends TestCase
      */
     public function test_the_transaction_by_customer()
     {
+        $cust = Customer::create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+
+        ]);
+        CustomerAddress::create([
+            'customer_id' => $cust->id,
+            "address" => $this->faker->word(6),
+        ]);
+        $data = Customer::find($cust->id);
+
         $login = $this->post('api/auth/login', [
-            "email" => "doejohn@example.net",
-            "password" => "123123",
+            "email" => $data->email,
+            "password" => "password",
         ],['Accept' => 'application/json'])->assertStatus(200)->decodeResponseJson();
 
         $token = $login['token'];
@@ -38,35 +55,67 @@ class TransactionTest extends TestCase
      */
     public function test_create_transaction()
     {
+        $cust = Customer::create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+
+        ]);
+        CustomerAddress::create([
+            'customer_id' => $cust->id,
+            "address" => $this->faker->word(6),
+        ]);
+        $data = Customer::find($cust->id);
+
         $login = $this->post('api/auth/login', [
-            "email" => "doejohn@example.net",
-            "password" => "123123",
+            "email" => $data->email,
+            "password" => "password",
         ],['Accept' => 'application/json'])->assertStatus(200)->decodeResponseJson();
 
         $token = $login['token'];
+
+        $product = Product::create([
+            'name' => $this->faker->word(),
+            'price' => $this->faker->numberBetween(5000, 200000),
+        ]);
+
+        $product2 = Product::create([
+            'name' => $this->faker->word(),
+            'price' => $this->faker->numberBetween(5000, 200000),
+        ]);
+
+        $paymentMethod = PaymentMethod::create([
+            'name' => $this->faker->word(),
+            'is_active' => 1,
+        ]);
+
+        $paymentMethod2 = PaymentMethod::create([
+            'name' => $this->faker->word(),
+            'is_active' => 1,
+        ]);
 
 
         $this->json('POST', 'api/transaction',
             [
                 "products" => [
                         [
-                         "id" => 1,
-                         "quantity" => 2
+                            "id" => $product->id,
+                            "quantity" => $this->faker->numberBetween(1, 30),
                         ],
                         [
-                            "id" => 2,
-                            "quantity" => 1
-                        ]
+                            "id" => $product2->id,
+                            "quantity" => $this->faker->numberBetween(1, 30),
+                        ],
                 ],
                 "payment_method" => [
-                                [
-                                  "id" => 1,
-                                  "amount" => 14000
-                                ],
-                                [
-                                     "id" => 2,
-                                     "amount" => 10000
-                                ]
+                    [
+                        "id" => $paymentMethod->id,
+                        "amount" => $this->faker->numberBetween(1000, 200000),
+                    ],
+                    [
+                         "id" => $paymentMethod2->id,
+                         "amount" => $this->faker->numberBetween(1000, 200000),
+                    ],
                 ]
             ], ['Authorization' => 'Bearer ' . $token, 'Accept' => 'application/json'])
         ->assertStatus(200)
