@@ -13,3 +13,5 @@ Use the 'Collection Transactions' folder to test the api or to type the 'php art
 Import into postman or thunder client for collection and env API.
 
 setup base_url on env API if base url not 127.0.0.1:8000/api.
+
+input token on env collection after receive token from login.
