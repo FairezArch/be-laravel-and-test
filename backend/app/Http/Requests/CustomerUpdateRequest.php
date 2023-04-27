@@ -26,7 +26,7 @@ class CustomerUpdateRequest extends FormRequest
             'name' => 'required|string|min:1',
             'email' => 'required|email|unique:customers,email,' . $this->customer->id,
             'password' => 'string|min:6',
-            'address' => 'required|string|min:3',
+            'address' => 'required|string',
         ];
     }
 }
