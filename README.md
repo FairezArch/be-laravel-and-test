@@ -33,8 +33,8 @@
 ## How to run Collection API Transactions
 - Postman
     - Open Postman.
-    - Open menu collection -> import 'thunder-environment_transaction_postman.json' -> files.
-    - Open menu environment -> import 'thunder-collection_waizy_postman.json' -> files.
+    - Open menu collection -> import -> files -> thunder-environment_transaction_postman.json.
+    - Open menu environment -> import -> files -> thunder-collection_waizy_postman.json.
     - Setup base_url on env API if base url not 127.0.0.1:8000/api.
     - Input token on env collection after receive token from login.
     
